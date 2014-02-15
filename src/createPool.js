@@ -60,7 +60,8 @@
         });
       }
       else if (job.type === kTypeEmit) {
-        t.emit(job.srcTextOrEventType, job.cbOrData);
+        //t.emit(job.srcTextOrEventType, job.cbOrData);
+		t.emit.apply(t,job.cbOrData);
         nextJob(t);
       }
     }
@@ -123,8 +124,8 @@
 
 
 
-  function emitAny (event, data) {
-    qPush(event, data, kTypeEmit);
+  function emitAny (event) {
+    qPush(event, arguments, kTypeEmit); //Array.prototype.slice.call(arguments)
     if (idleThreads.length) {
       nextJob(idleThreads.pop());
     }
@@ -134,9 +135,11 @@
 
 
 
-  function emitAll (event, data) {
-    pool.forEach(function (v,i,o) {
-      v.emit(event, data);
+  function emitAll () { //event
+	var args = arguments;
+	pool.forEach(function (v,i,o) {
+      //v.emit(event, Array.prototype.slice.call(arguments));
+	  v.emit.apply(v, args);
     });
     
     return poolObject;
